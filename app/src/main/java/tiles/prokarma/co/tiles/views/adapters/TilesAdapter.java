@@ -10,6 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -35,6 +37,8 @@ public class TilesAdapter extends RecyclerView.Adapter<TilesAdapter.TilesViewHol
 
     int flippedImagesCount = 0;
     int attempts = 0;
+    // to avoid flipping of image multiple times
+    int flippedImagePosition = -1;
 
     HomeActivity mainActivity;
 
@@ -68,7 +72,8 @@ public class TilesAdapter extends RecyclerView.Adapter<TilesAdapter.TilesViewHol
             public void onClick(View view) {
                 try{
                     // do nothing if the clicked image is already flipped
-                    if(!matchedImages.contains(photo.getId())){
+                    if(!matchedImages.contains(photo.getId()) && flippedImagePosition != viewHolder.getAdapterPosition()){
+                        flippedImagePosition = viewHolder.getAdapterPosition();
                         mainActivity.updateAttempts(++attempts);
                         // clicked image is first image
                         if(flippedImages.size() == 0) {
@@ -97,7 +102,7 @@ public class TilesAdapter extends RecyclerView.Adapter<TilesAdapter.TilesViewHol
                                 }
                             };
 
-                            new Handler().postDelayed(isAliveTimerRunnable, 1000);
+                            new Handler().postDelayed(isAliveTimerRunnable, 2000);
                         }
                         // check to compare all the matches are identified
                     }else if(flippedImagesCount >= tiles.getChildCount()){
@@ -129,35 +134,27 @@ public class TilesAdapter extends RecyclerView.Adapter<TilesAdapter.TilesViewHol
     }
 
     public void rotateImage(final TilesViewHolder viewHolder, final ImageView image, final boolean flagReset){
-//        ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flipping);
-//        anim.setTarget(image);
-//        anim.setDuration(500);
-//        anim.start();
-//        anim.addListener(new Animator.AnimatorListener() {
-//            @Override
-//            public void onAnimationStart(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationEnd(Animator animator) {
-//                if(!flagReset)
-//                    Glide.with(mContext).load(matrix.get(viewHolder.getAdapterPosition()).getUrl()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(image);
-//                else
-//                    image.setImageDrawable(mContext.getResources().getDrawable(R.mipmap.ic_launcher));
-//            }
-//
-//            @Override
-//            public void onAnimationCancel(Animator animator) {
-//
-//            }
-//
-//            @Override
-//            public void onAnimationRepeat(Animator animator) {
-//
-//            }
-//        });
-        Glide.with(mContext).load(matrix.get(viewHolder.getAdapterPosition()).getUrl()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(image);
+        Animation aniRotate = AnimationUtils.loadAnimation(mContext,R.anim.flipping);
+        image.startAnimation(aniRotate);
+        aniRotate.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animator) {
+                if(!flagReset)
+                    Glide.with(mContext).load(matrix.get(viewHolder.getAdapterPosition()).getUrl()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(image);
+                else
+                    image.setImageDrawable(mContext.getResources().getDrawable(R.mipmap.ic_launcher));
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animator) {
+
+            }
+        });
     }
 
     class TilesViewHolder extends RecyclerView.ViewHolder{

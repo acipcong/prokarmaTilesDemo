@@ -1,7 +1,7 @@
 package tiles.prokarma.co.tiles.views.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -23,6 +23,7 @@ import tiles.prokarma.co.tiles.network.request.ImageRequest;
 import tiles.prokarma.co.tiles.network.tos.Photo;
 import tiles.prokarma.co.tiles.network.tos.Photos;
 import tiles.prokarma.co.tiles.util.Constants;
+import tiles.prokarma.co.tiles.util.SharedPreferenceUtil;
 import tiles.prokarma.co.tiles.views.adapters.TilesAdapter;
 
 public class HomeActivity extends AppCompatActivity implements ResponseListener {
@@ -33,6 +34,8 @@ public class HomeActivity extends AppCompatActivity implements ResponseListener 
     TextView attempts, best;
 
     Button start, reset;
+
+    SharedPreferenceUtil preferenceUtil;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +48,9 @@ public class HomeActivity extends AppCompatActivity implements ResponseListener 
             tiles = findViewById(R.id.tiles);
             start = findViewById(R.id.start);
             reset = findViewById(R.id.reset);
+
+            preferenceUtil = new SharedPreferenceUtil(getApplicationContext());
+            best.setText(preferenceUtil.getBestAttempts());
 
             start.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -107,5 +113,6 @@ public class HomeActivity extends AppCompatActivity implements ResponseListener 
 
     public void updateBest(String attempts) {
         best.setText(attempts+"");
+        preferenceUtil.saveBestAttempts(attempts);
     }
 }
