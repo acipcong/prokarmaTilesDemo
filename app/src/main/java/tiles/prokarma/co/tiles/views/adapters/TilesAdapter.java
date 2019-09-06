@@ -66,41 +66,45 @@ public class TilesAdapter extends RecyclerView.Adapter<TilesAdapter.TilesViewHol
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // do nothing if the clicked image is already flipped
-                if(!matchedImages.contains(photo.getId())){
-                    mainActivity.updateAttempts(++attempts);
-                    // clicked image is first image
-                    if(flippedImages.size() == 0) {
-                        flippedImages.add(photo.getId());
-                        rotateImage(viewHolder, viewHolder.image, false);
-                        // clicked image to be compared with previously flipped image and if it matches with previous image
-                    }else if(flippedImages.size() == 1 && photo.getId().equalsIgnoreCase(flippedImages.get(0))){
-                        flippedImagesCount += 2;
-                        if(flippedImagesCount >= tiles.getChildCount()){
-                            mainActivity.updateBest(attempts);
-                        }
-                        matchedImages.add(photo.getId());
-                        rotateImage(viewHolder, viewHolder.image, false);
-                        flippedImages.clear();
-                        // clicked image to compared and if it doesnt match reset to original positions
-                    }else if(flippedImages.size() == 1){
-                        rotateImage(viewHolder, viewHolder.image, false);
-
-                        final Runnable isAliveTimerRunnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                resetImagesWithTags(flippedImages.get(0));
-                                resetImagesWithTags(photo.getId());
-                                flippedImages.clear();
-
+                try{
+                    // do nothing if the clicked image is already flipped
+                    if(!matchedImages.contains(photo.getId())){
+                        mainActivity.updateAttempts(++attempts);
+                        // clicked image is first image
+                        if(flippedImages.size() == 0) {
+                            flippedImages.add(photo.getId());
+                            rotateImage(viewHolder, viewHolder.image, false);
+                            // clicked image to be compared with previously flipped image and if it matches with previous image
+                        }else if(flippedImages.size() == 1 && photo.getId().equalsIgnoreCase(flippedImages.get(0))){
+                            flippedImagesCount += 2;
+                            if(flippedImagesCount >= tiles.getChildCount()){
+                                mainActivity.updateBest(attempts+"");
                             }
-                        };
+                            matchedImages.add(photo.getId());
+                            rotateImage(viewHolder, viewHolder.image, false);
+                            flippedImages.clear();
+                            // clicked image to compared and if it doesnt match reset to original positions
+                        }else if(flippedImages.size() == 1){
+                            rotateImage(viewHolder, viewHolder.image, false);
 
-                        new Handler().postDelayed(isAliveTimerRunnable, 2000);
+                            final Runnable isAliveTimerRunnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    resetImagesWithTags(flippedImages.get(0));
+                                    resetImagesWithTags(photo.getId());
+                                    flippedImages.clear();
+
+                                }
+                            };
+
+                            new Handler().postDelayed(isAliveTimerRunnable, 1000);
+                        }
+                        // check to compare all the matches are identified
+                    }else if(flippedImagesCount >= tiles.getChildCount()){
+                        mainActivity.updateBest(attempts+"");
                     }
-                    // check to compare all the matches are identified
-                }else if(flippedImagesCount >= tiles.getChildCount()){
-                    mainActivity.updateBest(attempts);
+                }catch (Exception e){
+                    mainActivity.updateBest("in adapter " + e.getMessage());
                 }
             }
         });
@@ -125,34 +129,35 @@ public class TilesAdapter extends RecyclerView.Adapter<TilesAdapter.TilesViewHol
     }
 
     public void rotateImage(final TilesViewHolder viewHolder, final ImageView image, final boolean flagReset){
-        ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flipping);
-        anim.setTarget(image);
-        anim.setDuration(500);
-        anim.start();
-        anim.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                if(!flagReset)
-                    Glide.with(mContext).load(matrix.get(viewHolder.getAdapterPosition()).getUrl()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(image);
-                else
-                    image.setImageDrawable(mContext.getResources().getDrawable(R.mipmap.ic_launcher));
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
-            }
-        });
+//        ObjectAnimator anim = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.flipping);
+//        anim.setTarget(image);
+//        anim.setDuration(500);
+//        anim.start();
+//        anim.addListener(new Animator.AnimatorListener() {
+//            @Override
+//            public void onAnimationStart(Animator animator) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationEnd(Animator animator) {
+//                if(!flagReset)
+//                    Glide.with(mContext).load(matrix.get(viewHolder.getAdapterPosition()).getUrl()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(image);
+//                else
+//                    image.setImageDrawable(mContext.getResources().getDrawable(R.mipmap.ic_launcher));
+//            }
+//
+//            @Override
+//            public void onAnimationCancel(Animator animator) {
+//
+//            }
+//
+//            @Override
+//            public void onAnimationRepeat(Animator animator) {
+//
+//            }
+//        });
+        Glide.with(mContext).load(matrix.get(viewHolder.getAdapterPosition()).getUrl()).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).into(image);
     }
 
     class TilesViewHolder extends RecyclerView.ViewHolder{

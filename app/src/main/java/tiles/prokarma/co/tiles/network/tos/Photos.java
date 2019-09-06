@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class Photos {
-    @SerializedName("photoList")
+    @SerializedName("photos")
     PhotoList photoList;
 
     @SerializedName("stat")
